@@ -23,14 +23,14 @@ class WinPythonBuilder : PythonBuilder
 
     #>
 
-    [string] $InstallationTemplateName
-    [string] $InstallationScriptName
-    [string] $OutputArtifactName
+    [System.String] $InstallationTemplateName
+    [System.String] $InstallationScriptName
+    [System.String] $OutputArtifactName
 
     WinPythonBuilder(
-        [version] $version,
-        [string] $architecture,
-        [string] $platform
+        [System.String] $version,
+        [System.String] $architecture,
+        [System.String] $platform
     ) : Base($version, $architecture, $platform)
     {
         $this.InstallationTemplateName = "win-setup-template.ps1"
@@ -38,7 +38,7 @@ class WinPythonBuilder : PythonBuilder
         $this.OutputArtifactName = "python-$Version-$Platform-$Architecture.zip"
     }
 
-    [string] GetPythonExtension()
+    [System.String] GetPythonExtension()
     {
         <#
         .SYNOPSIS
@@ -50,7 +50,7 @@ class WinPythonBuilder : PythonBuilder
         return $extension
     }
 
-    [string] GetArchitectureExtension()
+    [System.String] GetArchitectureExtension()
     {
         <#
         .SYNOPSIS
@@ -73,7 +73,7 @@ class WinPythonBuilder : PythonBuilder
         return $ArchitectureExtension
     }
 
-    [uri] GetSourceUri()
+    [System.Uri] GetSourceUri()
     {
         <#
         .SYNOPSIS
@@ -81,15 +81,17 @@ class WinPythonBuilder : PythonBuilder
         #>
 
         $base = $this.GetBaseUri()
+        $versionName = $this.GetVersion()
+        $symverVersion = $this.ConvertVersion($this.Version, "SymverNotation")
         $architecture = $this.GetArchitectureExtension()
         $extension = $this.GetPythonExtension()
 
-        $uri = "${base}/$($this.Version)/python-$($this.Version)${architecture}${extension}"
+        $uri = "${base}/${versionName}/python-${symverVersion}${architecture}${extension}"
 
         return $uri
     }
 
-    [string] Download()
+    [System.String] Download()
     {
         <#
         .SYNOPSIS
@@ -105,7 +107,7 @@ class WinPythonBuilder : PythonBuilder
         return $sourcesLocation
     }
 
-    [void] CreateInstallationScript()
+    [System.Void] CreateInstallationScript()
     {
         <#
         .SYNOPSIS
@@ -129,13 +131,13 @@ class WinPythonBuilder : PythonBuilder
         Write-Debug "Done; Installation script location: $installationScriptLocation)"
     }
 
-    [void] ArchiveArtifact()
+    [System.Void] ArchiveArtifact()
     {
         $OutputPath = Join-Path $this.ArtifactFolderLocation $this.OutputArtifactName
         Create-SevenZipArchive -SourceFolder $this.WorkFolderLocation -ArchivePath $OutputPath
     }
 
-    [void] Build()
+    [System.Void] Build()
     {
         <#
         .SYNOPSIS

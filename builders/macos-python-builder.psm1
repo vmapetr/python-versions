@@ -18,12 +18,12 @@ class macOSPythonBuilder : NixPythonBuilder
     #>
 
     macOSPythonBuilder(
-        [version] $version,
-        [string] $architecture,
-        [string] $platform
+        [System.String] $version,
+        [System.String] $architecture,
+        [System.String] $platform
     ) : Base($version, $architecture, $platform) { }
 
-    [void] Configure() 
+    [System.Void] Configure() 
     {
         <#
         .SYNOPSIS
@@ -63,7 +63,7 @@ class macOSPythonBuilder : NixPythonBuilder
         Execute-Command -Command $configureString
     }
 
-    [void] PrepareEnvironment()
+    [System.Void] PrepareEnvironment()
     {
         <#
         .SYNOPSIS

@@ -29,14 +29,14 @@ class NixPythonBuilder : PythonBuilder
 
     #>
 
-    [string] $InstallationTemplateName
-    [string] $InstallationScriptName
-    [string] $OutputArtifactName
+    [System.String] $InstallationTemplateName
+    [System.String] $InstallationScriptName
+    [System.String] $OutputArtifactName
 
     NixPythonBuilder(
-        [version] $version,
-        [string] $architecture,
-        [string] $platform
+        [System.String] $version,
+        [System.String] $architecture,
+        [System.String] $platform
     ) : Base($version, $architecture, $platform)
     {
         $this.InstallationTemplateName = "nix-setup-template.sh"	
@@ -44,7 +44,7 @@ class NixPythonBuilder : PythonBuilder
         $this.OutputArtifactName = "python-$Version-$Platform-$Architecture.tar.gz"
     }
 
-    [uri] GetSourceUri()
+    [System.Uri] GetSourceUri()
     {
         <#
         .SYNOPSIS
@@ -52,11 +52,13 @@ class NixPythonBuilder : PythonBuilder
         #>
 
         $base = $this.GetBaseUri()
+        $versionName = $this.GetVersion()
+        $symverVersion = $this.ConvertVersion($this.Version, "SymverNotation")
 
-        return "${base}/$($this.Version)/Python-$($this.Version).tgz"
+        return "${base}/${versionName}/Python-${symverVersion}.tgz"
     }
 
-    [string] GetPythonBinary()
+    [System.String] GetPythonBinary()
     {
         <#
         .SYNOPSIS
@@ -67,7 +69,7 @@ class NixPythonBuilder : PythonBuilder
         return $pythonBinary
     }
 
-    [string] Download()
+    [System.String] Download()
     {
         <#
         .SYNOPSIS
@@ -87,7 +89,7 @@ class NixPythonBuilder : PythonBuilder
         return $expandedSourceLocation
     }
 
-    [void] CreateInstallationScript()
+    [System.Void] CreateInstallationScript()
     {
         <#
         .SYNOPSIS
@@ -102,7 +104,7 @@ class NixPythonBuilder : PythonBuilder
         $variablesToReplace = @{
             "{{__VERSION_MAJOR__}}" = $this.Version.Major;
             "{{__VERSION_MINOR__}}" = $this.Version.Minor;
-            "{{__VERSION_BUILD__}}" = $this.Version.Build;
+            "{{__VERSION_BUILD__}}" = $this.Version.Patch;
         }
         $variablesToReplace.keys | ForEach-Object { $installationTemplateContent = $installationTemplateContent.Replace($_, $variablesToReplace[$_]) }
 
@@ -111,7 +113,7 @@ class NixPythonBuilder : PythonBuilder
         Write-Debug "Done; Installation script location: $installationScriptLocation)"
     }
 
-    [void] Make()
+    [System.Void] Make()
     {
         <#
         .SYNOPSIS
@@ -127,19 +129,19 @@ class NixPythonBuilder : PythonBuilder
         Write-Debug "Done; Make log location: $buildOutputLocation"
     }
 
-    [void] CopyBuildResults()
+    [System.Void] CopyBuildResults()
     {
         $buildFolder = $this.GetFullPythonToolcacheLocation()
         Move-Item -Path "$buildFolder/*" -Destination $this.WorkFolderLocation
     }
 
-    [void] ArchiveArtifact()
+    [System.Void] ArchiveArtifact()
     {
         $OutputPath = Join-Path $this.ArtifactFolderLocation $this.OutputArtifactName
         Create-TarArchive -SourceFolder $this.WorkFolderLocation -ArchivePath $OutputPath
     }
 
-    [void] Build()
+    [System.Void] Build()
     {
         <#
         .SYNOPSIS

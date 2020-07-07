@@ -30,30 +30,32 @@ class PythonBuilder
 
     #>
 
-    [version] $Version
-    [string] $Architecture
-    [string] $Platform
-    [string] $HostedToolcacheLocation
-    [string] $TempFolderLocation
-    [string] $WorkFolderLocation
-    [string] $ArtifactFolderLocation
-    [string] $InstallationTemplatesLocation
+    [System.Management.Automation.SemanticVersion] $Version
+    [System.String] $Architecture
+    [System.String] $Platform
+    [System.String] $HostedToolcacheLocation
+    [System.String] $TempFolderLocation
+    [System.String] $WorkFolderLocation
+    [System.String] $ArtifactFolderLocation
+    [System.String] $InstallationTemplatesLocation
+    [System.String] $ConfigsLocation
 
-    PythonBuilder ([version] $version, [string] $architecture, [string] $platform)
+    PythonBuilder ([System.String] $version, [System.String] $architecture, [System.String] $platform)
     {
-        $this.Version = $version
-        $this.Architecture = $architecture
-        $this.Platform = $platform
+        $this.InstallationTemplatesLocation = Join-Path -Path $PSScriptRoot -ChildPath "../installers"
+        $this.ConfigsLocation = Join-Path -Path $PSScriptRoot -ChildPath "../config"
 
         $this.HostedToolcacheLocation = $env:AGENT_TOOLSDIRECTORY
         $this.TempFolderLocation = $env:BUILD_SOURCESDIRECTORY
         $this.WorkFolderLocation = $env:BUILD_BINARIESDIRECTORY
         $this.ArtifactFolderLocation = $env:BUILD_STAGINGDIRECTORY
 
-        $this.InstallationTemplatesLocation = Join-Path -Path $PSScriptRoot -ChildPath "../installers"
+        $this.Version = $this.ConvertVersion($version, "PythonNotation")
+        $this.Architecture = $architecture
+        $this.Platform = $platform
     }
 
-    [uri] GetBaseUri()
+    [System.Uri] GetBaseUri()
     {
         <#
         .SYNOPSIS
@@ -63,7 +65,7 @@ class PythonBuilder
         return "https://www.python.org/ftp/python"
     }
 
-    [string] GetPythonToolcacheLocation()
+    [System.String] GetPythonToolcacheLocation()
     {
         <#
         .SYNOPSIS
@@ -73,7 +75,7 @@ class PythonBuilder
         return "$($this.HostedToolcacheLocation)/Python"
     }
 
-    [string] GetFullPythonToolcacheLocation()
+    [System.String] GetFullPythonToolcacheLocation()
     {
         <#
         .SYNOPSIS
@@ -84,7 +86,63 @@ class PythonBuilder
         return "$pythonToolcacheLocation/$($this.Version)/$($this.Architecture)"
     }
 
-    [void] PreparePythonToolcacheLocation()
+    [System.String] GetVersion()
+    {
+        <#
+        .SYNOPSIS
+        Return Major.Minor.Build version string.
+        #>
+
+        return "$($this.Version.Major).$($this.Version.Minor).$($this.Version.Patch)"
+    }
+
+    [System.String] ConvertVersion($version, $notation)
+        <#
+        .SYNOPSIS
+        Convert version to required notation correct
+
+        .PARAMETER Version
+        The version of Python that should be converted.
+
+        .PARAMETER notation
+        The notation that should be used in version. Described in versions-mapping.json config file.
+
+        #>
+    {
+        # Load version mapping
+        $versionMap = $this.GetVersionMapping()
+        $mapContext = $versionMap | Select-Object -ExpandProperty $notation
+
+        # Get required delimiters and regexp pattern
+        $preReleaseDelimiter = $mapContext | Select-Object -ExpandProperty "preReleaseDelimiter"
+        $releseVersionDelimiter = $mapContext | Select-Object -ExpandProperty "releseVersionDelimiter"
+        [regex] $pattern = $mapContext | Select-Object -ExpandProperty "pattern"
+
+        $versionGroups = $pattern.Match($version)
+
+        # Get base version string
+        $versionString = $versionGroups.Groups["Version"].Value
+
+        if ($versionGroups.Groups["PreReleaseLabel"].Success)
+        {
+            $preReleaseLabel = $versionGroups.Groups["PreReleaseLabel"].Value
+            $preReleaseLabelVersion = $versionGroups.Groups["PreReleaseVersion"].Value
+
+            # Get notation for current context
+            $preReleaseLabel = $mapContext  | Select-Object -ExpandProperty "releaseNotation" `
+                                            | Select-Object -ExpandProperty $preReleaseLabel
+
+            # Format symver correct pre-release version
+            $versionString += $preReleaseDelimiter
+            $versionString += $preReleaseLabel
+            $versionString += $releseVersionDelimiter
+            $versionString += $preReleaseLabelVersion
+        }   
+
+        return $versionString
+    }
+
+    [System.Void] PreparePythonToolcacheLocation()
     {
         <#
         .SYNOPSIS
@@ -103,5 +161,14 @@ class PythonBuilder
             Write-Host "Create $pythonBinariesLocation folder..."
             New-Item -ItemType Directory -Path $pythonBinariesLocation 
         }
+    }
+
+    ### MOVE TO HELPERS
+    [System.Object] GetVersionMapping()
+    {
+        $mapFileLocation = Join-Path -Path $this.ConfigsLocation -ChildPath "versions-mapping.json"
+        $versionMap = Get-Content -Path $mapFileLocation -Raw | ConvertFrom-Json
+
+        return $versionMap
     }
 }
