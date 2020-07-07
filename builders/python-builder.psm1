@@ -1,4 +1,5 @@
-class PythonBuilder {
+class PythonBuilder
+{
     <#
     .SYNOPSIS
     Base Python builder class.
@@ -38,7 +39,8 @@ class PythonBuilder {
     [string] $ArtifactFolderLocation
     [string] $InstallationTemplatesLocation
 
-    PythonBuilder ([version] $version, [string] $architecture, [string] $platform) {
+    PythonBuilder ([version] $version, [string] $architecture, [string] $platform)
+    {
         $this.Version = $version
         $this.Architecture = $architecture
         $this.Platform = $platform
@@ -51,7 +53,8 @@ class PythonBuilder {
         $this.InstallationTemplatesLocation = Join-Path -Path $PSScriptRoot -ChildPath "../installers"
     }
 
-    [uri] GetBaseUri() {
+    [uri] GetBaseUri()
+    {
         <#
         .SYNOPSIS
         Return base URI for Python build sources.
@@ -60,7 +63,8 @@ class PythonBuilder {
         return "https://www.python.org/ftp/python"
     }
 
-    [string] GetPythonToolcacheLocation() {
+    [string] GetPythonToolcacheLocation()
+    {
         <#
         .SYNOPSIS
         Return path to Python hostedtoolcache folder.
@@ -69,7 +73,8 @@ class PythonBuilder {
         return "$($this.HostedToolcacheLocation)/Python"
     }
 
-    [string] GetFullPythonToolcacheLocation() {
+    [string] GetFullPythonToolcacheLocation()
+    {
         <#
         .SYNOPSIS
         Return full path to hostedtoolcache Python folder.
@@ -79,17 +84,22 @@ class PythonBuilder {
         return "$pythonToolcacheLocation/$($this.Version)/$($this.Architecture)"
     }
 
-    [void] PreparePythonToolcacheLocation() {
+    [void] PreparePythonToolcacheLocation()
+    {
         <#
         .SYNOPSIS
         Prepare system hostedtoolcache folder for new Python version. 
         #>
+        
         $pythonBinariesLocation = $this.GetFullPythonToolcacheLocation()
 
-        if (Test-Path $pythonBinariesLocation) {
+        if (Test-Path $pythonBinariesLocation)
+        {
             Write-Host "Purge $pythonBinariesLocation folder..."
             Remove-Item $pythonBinariesLocation -Recurse -Force
-        } else {
+        }
+        else
+        {
             Write-Host "Create $pythonBinariesLocation folder..."
             New-Item -ItemType Directory -Path $pythonBinariesLocation 
         }

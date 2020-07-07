@@ -20,7 +20,8 @@ Required parameter. The platform for which Python will be built.
 
 #>
 
-param(
+param
+(
     [Parameter (Mandatory=$true)][Version] $Version,
     [Parameter (Mandatory=$true)][string] $Platform,
     [string] $Architecture = "x64"
@@ -30,7 +31,8 @@ Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "comm
 Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "nix-helpers.psm1") -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "win-helpers.psm1") -DisableNameChecking
 
-function Get-PythonBuilder {
+function Get-PythonBuilder
+{
     <#
     .SYNOPSIS
     Wrapper for class constructor to simplify importing PythonBuilder.
@@ -49,22 +51,33 @@ function Get-PythonBuilder {
 
     #>
 
-    param (
+    param
+    (
         [version] $Version,
         [string] $Architecture,
         [string] $Platform
     )
 
-    $Platform = $Platform.ToLower()  
-    if ($Platform -match 'win32') {
-        $builder = [WinPythonBuilder]::New($Version, $Architecture, $Platform)
-    } elseif ($Platform -match 'linux') {
-        $builder = [UbuntuPythonBuilder]::New($Version, $Architecture, $Platform)
-    } elseif ($Platform -match 'darwin') {
-        $builder = [macOSPythonBuilder]::New($Version, $Architecture, $Platform)
-    } else {
-        Write-Host "##vso[task.logissue type=error;] Invalid platform: $Platform"
-        exit 1
+    $Platform = $Platform.ToLower()
+    switch ($Platform)
+    {
+        'win32'
+        {
+            $builder = [WinPythonBuilder]::New($Version, $Architecture, $Platform)
+        }
+        'linux'
+        {
+            $builder = [UbuntuPythonBuilder]::New($Version, $Architecture, $Platform)
+        }
+        'darwin'
+        {
+            $builder = [macOSPythonBuilder]::New($Version, $Architecture, $Platform)
+        }
+        default
+        {
+            Write-Host "##vso[task.logissue type=error;] Invalid platform: $Platform"
+            exit 1
+        }
     }
 
     return $builder

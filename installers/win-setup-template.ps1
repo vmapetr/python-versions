@@ -2,7 +2,8 @@
 [Version] $Version = "{{__VERSION__}}"
 [String] $PythonExecName = "{{__PYTHON_EXEC_NAME__}}"
 
-function Get-RegistryVersionFilter {
+function Get-RegistryVersionFilter
+{
     param
     (
         [Parameter(Mandatory)][String] $Architecture,
@@ -62,7 +63,8 @@ function Remove-RegistryEntries
     }
 }
 
-function Get-ExecParams {
+function Get-ExecParams
+{
     param
     (
         [Parameter(Mandatory)][Boolean] $IsMSI,
