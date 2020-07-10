@@ -1,7 +1,6 @@
 using module "./builders/python-builder.psm1"
 
-class WinPythonBuilder : PythonBuilder
-{
+class WinPythonBuilder : PythonBuilder {
     <#
     .SYNOPSIS
     Base Python builder class for Windows systems.
@@ -23,23 +22,21 @@ class WinPythonBuilder : PythonBuilder
 
     #>
 
-    [System.String] $InstallationTemplateName
-    [System.String] $InstallationScriptName
-    [System.String] $OutputArtifactName
+    [string] $InstallationTemplateName
+    [string] $InstallationScriptName
+    [string] $OutputArtifactName
 
     WinPythonBuilder(
-        [System.String] $version,
-        [System.String] $architecture,
-        [System.String] $platform
-    ) : Base($version, $architecture, $platform)
-    {
+        [string] $version,
+        [string] $architecture,
+        [string] $platform
+    ) : Base($version, $architecture, $platform) {
         $this.InstallationTemplateName = "win-setup-template.ps1"
         $this.InstallationScriptName = "setup.ps1"
         $this.OutputArtifactName = "python-$Version-$Platform-$Architecture.zip"
     }
 
-    [System.String] GetPythonExtension()
-    {
+    [string] GetPythonExtension() {
         <#
         .SYNOPSIS
         Return extension for required version of Python executable. 
@@ -50,22 +47,17 @@ class WinPythonBuilder : PythonBuilder
         return $extension
     }
 
-    [System.String] GetArchitectureExtension()
-    {
+    [string] GetArchitectureExtension() {
         <#
         .SYNOPSIS
         Return architecture suffix for Python executable. 
         #>
 
         $ArchitectureExtension = ""
-        if ($this.Architecture -eq "x64")
-        {
-            if ($this.Version -ge "3.5")
-            {
+        if ($this.Architecture -eq "x64") {
+            if ($this.Version -ge "3.5") {
                 $ArchitectureExtension = "-amd64"
-            }
-            else
-            {
+            } else {
                 $ArchitectureExtension = ".amd64"
             }
         }
@@ -73,8 +65,7 @@ class WinPythonBuilder : PythonBuilder
         return $ArchitectureExtension
     }
 
-    [System.Uri] GetSourceUri()
-    {
+    [uri] GetSourceUri() {
         <#
         .SYNOPSIS
         Get base Python URI and return complete URI for Python installation executable.
@@ -91,8 +82,7 @@ class WinPythonBuilder : PythonBuilder
         return $uri
     }
 
-    [System.String] Download()
-    {
+    [string] Download() {
         <#
         .SYNOPSIS
         Download Python installation executable into artifact location.
@@ -107,8 +97,7 @@ class WinPythonBuilder : PythonBuilder
         return $sourcesLocation
     }
 
-    [System.Void] CreateInstallationScript()
-    {
+    [void] CreateInstallationScript() {
         <#
         .SYNOPSIS
         Create Python artifact installation script based on specified template.
@@ -131,14 +120,12 @@ class WinPythonBuilder : PythonBuilder
         Write-Debug "Done; Installation script location: $installationScriptLocation)"
     }
 
-    [System.Void] ArchiveArtifact()
-    {
+    [void] ArchiveArtifact() {
         $OutputPath = Join-Path $this.ArtifactFolderLocation $this.OutputArtifactName
         Create-SevenZipArchive -SourceFolder $this.WorkFolderLocation -ArchivePath $OutputPath
     }
 
-    [System.Void] Build()
-    {
+    [void] Build() {
         <#
         .SYNOPSIS
         Generates Python artifact from downloaded Python installation executable.

@@ -1,7 +1,6 @@
 using module "./builders/python-builder.psm1"
 
-class NixPythonBuilder : PythonBuilder
-{
+class NixPythonBuilder : PythonBuilder {
     <#
     .SYNOPSIS
     Base Python builder class for *Nix systems.
@@ -29,23 +28,21 @@ class NixPythonBuilder : PythonBuilder
 
     #>
 
-    [System.String] $InstallationTemplateName
-    [System.String] $InstallationScriptName
-    [System.String] $OutputArtifactName
+    [string] $InstallationTemplateName
+    [string] $InstallationScriptName
+    [string] $OutputArtifactName
 
     NixPythonBuilder(
-        [System.String] $version,
-        [System.String] $architecture,
-        [System.String] $platform
-    ) : Base($version, $architecture, $platform)
-    {
+        [string] $version,
+        [string] $architecture,
+        [string] $platform
+    ) : Base($version, $architecture, $platform) {
         $this.InstallationTemplateName = "nix-setup-template.sh"	
         $this.InstallationScriptName = "setup.sh"
         $this.OutputArtifactName = "python-$Version-$Platform-$Architecture.tar.gz"
     }
 
-    [System.Uri] GetSourceUri()
-    {
+    [uri] GetSourceUri() {
         <#
         .SYNOPSIS
         Get base Python URI and return complete URI for Python sources.
@@ -58,8 +55,7 @@ class NixPythonBuilder : PythonBuilder
         return "${base}/${versionName}/Python-${symverVersion}.tgz"
     }
 
-    [System.String] GetPythonBinary()
-    {
+    [string] GetPythonBinary() {
         <#
         .SYNOPSIS
         Return name of Python binary.
@@ -69,8 +65,7 @@ class NixPythonBuilder : PythonBuilder
         return $pythonBinary
     }
 
-    [System.String] Download()
-    {
+    [string] Download() {
         <#
         .SYNOPSIS
         Download Python sources and extract them at temporary work folder. Returns expanded archive location path.
@@ -89,8 +84,7 @@ class NixPythonBuilder : PythonBuilder
         return $expandedSourceLocation
     }
 
-    [System.Void] CreateInstallationScript()
-    {
+    [void] CreateInstallationScript() {
         <#
         .SYNOPSIS
         Create Python artifact installation script based on template specified in InstallationTemplateName property.
@@ -113,8 +107,7 @@ class NixPythonBuilder : PythonBuilder
         Write-Debug "Done; Installation script location: $installationScriptLocation)"
     }
 
-    [System.Void] Make()
-    {
+    [void] Make() {
         <#
         .SYNOPSIS
         Executes "make" and "make install" commands for configured build sources. Make output will be writen in build_output.txt located in artifact location folder.
@@ -129,20 +122,17 @@ class NixPythonBuilder : PythonBuilder
         Write-Debug "Done; Make log location: $buildOutputLocation"
     }
 
-    [System.Void] CopyBuildResults()
-    {
+    [void] CopyBuildResults() {
         $buildFolder = $this.GetFullPythonToolcacheLocation()
         Move-Item -Path "$buildFolder/*" -Destination $this.WorkFolderLocation
     }
 
-    [System.Void] ArchiveArtifact()
-    {
+    [void] ArchiveArtifact() {
         $OutputPath = Join-Path $this.ArtifactFolderLocation $this.OutputArtifactName
         Create-TarArchive -SourceFolder $this.WorkFolderLocation -ArchivePath $OutputPath
     }
 
-    [System.Void] Build()
-    {
+    [void] Build() {
         <#
         .SYNOPSIS
         Build Python artifact from sources. 

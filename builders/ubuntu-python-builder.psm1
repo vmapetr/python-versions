@@ -1,7 +1,6 @@
 using module "./builders/nix-python-builder.psm1"
 
-class UbuntuPythonBuilder : NixPythonBuilder
-{
+class UbuntuPythonBuilder : NixPythonBuilder {
     <#
     .SYNOPSIS
     Ubuntu Python builder class.
@@ -18,13 +17,12 @@ class UbuntuPythonBuilder : NixPythonBuilder
     #>
 
     UbuntuPythonBuilder(
-        [System.String] $version,
-        [System.String] $architecture,
-        [System.String] $platform
+        [string] $version,
+        [string] $architecture,
+        [string] $platform
     ) : Base($version, $architecture, $platform) { }
 
-    [System.Void] Configure()
-    {
+    [void] Configure() {
         <#
         .SYNOPSIS
         Execute configure script with required parameters.
@@ -40,23 +38,20 @@ class UbuntuPythonBuilder : NixPythonBuilder
         $configureString += " --enable-optimizations"
 
         ### Compile with ucs4 for Python 2.x. On 3.x, ucs4 is enabled by default
-        if ($this.Version -lt "3.0.0")
-        {
+        if ($this.Version -lt "3.0.0") {
             $configureString += " --enable-unicode=ucs4"
         }
 
         ### Compile with support of loadable sqlite extensions. Unavailable for Python 2.*
         ### Link to documentation (https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.enable_load_extension)
-        if ($this.Version -ge "3.2.0")
-        {
+        if ($this.Version -ge "3.2.0") {
             $configureString += " --enable-loadable-sqlite-extensions"
         }
 
         Execute-Command -Command $configureString
     }
 
-    [System.Void] PrepareEnvironment()
-    {
+    [void] PrepareEnvironment() {
         <#
         .SYNOPSIS
         Prepare system environment by installing dependencies and required packages.
@@ -68,12 +63,9 @@ class UbuntuPythonBuilder : NixPythonBuilder
         }
 
         ### Compile with tkinter support
-        if ($this.Version -gt "3.0.0")
-        {
+        if ($this.Version -gt "3.0.0") {
             $tkinterInstallString = "sudo apt-get install -y --allow-downgrades python3-tk tk-dev"
-        }
-        else
-        {
+        } else {
             $tkinterInstallString = "sudo apt install -y python-tk tk-dev"
         }
 
@@ -94,8 +86,7 @@ class UbuntuPythonBuilder : NixPythonBuilder
             Execute-Command -Command "sudo apt install -y $_"
         }
 
-        if ($this.Platform -ne "linux-16.04")
-        {
+        if ($this.Platform -ne "linux-16.04") {
             ### On Ubuntu-1804, libgdbm-compat-dev has older modules that are no longer in libgdbm-dev
             Execute-Command -Command "sudo apt install -y libgdbm-compat-dev"
         }

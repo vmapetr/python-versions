@@ -1,7 +1,6 @@
 using module "./builders/nix-python-builder.psm1"
 
-class macOSPythonBuilder : NixPythonBuilder
-{
+class macOSPythonBuilder : NixPythonBuilder {
     <#
     .SYNOPSIS
     MacOS Python builder class.
@@ -18,13 +17,12 @@ class macOSPythonBuilder : NixPythonBuilder
     #>
 
     macOSPythonBuilder(
-        [System.String] $version,
-        [System.String] $architecture,
-        [System.String] $platform
+        [string] $version,
+        [string] $architecture,
+        [string] $platform
     ) : Base($version, $architecture, $platform) { }
 
-    [System.Void] Configure() 
-    {
+    [void] Configure() {
         <#
         .SYNOPSIS
         Execute configure script with required parameters.
@@ -41,20 +39,16 @@ class macOSPythonBuilder : NixPythonBuilder
         ### Solution is to install these libraries from a third-party package manager,
         ### and then add the appropriate paths for the header and library files to configure command.
         ### Link to documentation (https://cpython-devguide.readthedocs.io/setup/#build-dependencies)
-        if ($this.Version -lt "3.7.0")
-        {
+        if ($this.Version -lt "3.7.0") {
             $env:LDFLAGS = "-L$(brew --prefix openssl)/lib"
             $env:CFLAGS = "-I$(brew --prefix openssl)/include"
-        }
-        else
-        {
+        } else {
             $configureString += " --with-openssl=/usr/local/opt/openssl"
         }
 
         ### Compile with support of loadable sqlite extensions. Unavailable for Python 2.*
         ### Link to documentation (https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.enable_load_extension)
-        if ($this.Version -ge "3.2.0")
-        {
+        if ($this.Version -ge "3.2.0") {
             $configureString += " --enable-loadable-sqlite-extensions"
             $env:LDFLAGS += " -L$(brew --prefix sqlite3)/lib"
             $env:CFLAGS += " -I$(brew --prefix sqlite3)/include"
@@ -63,8 +57,7 @@ class macOSPythonBuilder : NixPythonBuilder
         Execute-Command -Command $configureString
     }
 
-    [System.Void] PrepareEnvironment()
-    {
+    [void] PrepareEnvironment() {
         <#
         .SYNOPSIS
         Prepare system environment by installing dependencies and required packages.

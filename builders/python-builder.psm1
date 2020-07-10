@@ -1,5 +1,4 @@
-class PythonBuilder
-{
+class PythonBuilder {
     <#
     .SYNOPSIS
     Base Python builder class.
@@ -30,18 +29,17 @@ class PythonBuilder
 
     #>
 
-    [System.Management.Automation.SemanticVersion] $Version
-    [System.String] $Architecture
-    [System.String] $Platform
-    [System.String] $HostedToolcacheLocation
-    [System.String] $TempFolderLocation
-    [System.String] $WorkFolderLocation
-    [System.String] $ArtifactFolderLocation
-    [System.String] $InstallationTemplatesLocation
-    [System.String] $ConfigsLocation
+    [semver] $Version
+    [string] $Architecture
+    [string] $Platform
+    [string] $HostedToolcacheLocation
+    [string] $TempFolderLocation
+    [string] $WorkFolderLocation
+    [string] $ArtifactFolderLocation
+    [string] $InstallationTemplatesLocation
+    [string] $ConfigsLocation
 
-    PythonBuilder ([System.String] $version, [System.String] $architecture, [System.String] $platform)
-    {
+    PythonBuilder ([string] $version, [string] $architecture, [string] $platform) {
         $this.InstallationTemplatesLocation = Join-Path -Path $PSScriptRoot -ChildPath "../installers"
         $this.ConfigsLocation = Join-Path -Path $PSScriptRoot -ChildPath "../config"
 
@@ -55,8 +53,7 @@ class PythonBuilder
         $this.Platform = $platform
     }
 
-    [System.Uri] GetBaseUri()
-    {
+    [uri] GetBaseUri() {
         <#
         .SYNOPSIS
         Return base URI for Python build sources.
@@ -65,8 +62,7 @@ class PythonBuilder
         return "https://www.python.org/ftp/python"
     }
 
-    [System.String] GetPythonToolcacheLocation()
-    {
+    [string] GetPythonToolcacheLocation() {
         <#
         .SYNOPSIS
         Return path to Python hostedtoolcache folder.
@@ -75,8 +71,7 @@ class PythonBuilder
         return "$($this.HostedToolcacheLocation)/Python"
     }
 
-    [System.String] GetFullPythonToolcacheLocation()
-    {
+    [string] GetFullPythonToolcacheLocation() {
         <#
         .SYNOPSIS
         Return full path to hostedtoolcache Python folder.
@@ -86,8 +81,7 @@ class PythonBuilder
         return "$pythonToolcacheLocation/$($this.Version)/$($this.Architecture)"
     }
 
-    [System.String] GetVersion()
-    {
+    [string] GetVersion() {
         <#
         .SYNOPSIS
         Return Major.Minor.Build version string.
@@ -96,7 +90,7 @@ class PythonBuilder
         return "$($this.Version.Major).$($this.Version.Minor).$($this.Version.Patch)"
     }
 
-    [System.String] ConvertVersion($version, $notation)
+    [string] ConvertVersion($version, $notation) {
         <#
         .SYNOPSIS
         Convert version to required notation correct
@@ -108,7 +102,7 @@ class PythonBuilder
         The notation that should be used in version. Described in versions-mapping.json config file.
 
         #>
-    {
+
         # Load version mapping
         $versionMap = $this.GetVersionMapping()
         $mapContext = $versionMap | Select-Object -ExpandProperty $notation
@@ -123,8 +117,7 @@ class PythonBuilder
         # Get base version string
         $versionString = $versionGroups.Groups["Version"].Value
 
-        if ($versionGroups.Groups["PreReleaseLabel"].Success)
-        {
+        if ($versionGroups.Groups["PreReleaseLabel"].Success) {
             $preReleaseLabel = $versionGroups.Groups["PreReleaseLabel"].Value
             $preReleaseLabelVersion = $versionGroups.Groups["PreReleaseVersion"].Value
 
@@ -142,8 +135,7 @@ class PythonBuilder
         return $versionString
     }
 
-    [System.Void] PreparePythonToolcacheLocation()
-    {
+    [void] PreparePythonToolcacheLocation() {
         <#
         .SYNOPSIS
         Prepare system hostedtoolcache folder for new Python version. 
@@ -151,21 +143,17 @@ class PythonBuilder
         
         $pythonBinariesLocation = $this.GetFullPythonToolcacheLocation()
 
-        if (Test-Path $pythonBinariesLocation)
-        {
+        if (Test-Path $pythonBinariesLocation) {
             Write-Host "Purge $pythonBinariesLocation folder..."
             Remove-Item $pythonBinariesLocation -Recurse -Force
-        }
-        else
-        {
+        } else {
             Write-Host "Create $pythonBinariesLocation folder..."
             New-Item -ItemType Directory -Path $pythonBinariesLocation 
         }
     }
 
     ### MOVE TO HELPERS
-    [System.Object] GetVersionMapping()
-    {
+    [object] GetVersionMapping() {
         $mapFileLocation = Join-Path -Path $this.ConfigsLocation -ChildPath "versions-mapping.json"
         $versionMap = Get-Content -Path $mapFileLocation -Raw | ConvertFrom-Json
 

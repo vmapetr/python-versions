@@ -20,19 +20,17 @@ Required parameter. The platform for which Python will be built.
 
 #>
 
-param
-(
-    [Parameter (Mandatory=$true)][System.String] $Version,
-    [Parameter (Mandatory=$true)][System.String] $Platform,
-    [System.String] $Architecture = "x64"
+param (
+    [Parameter (Mandatory=$true)][string] $Version,
+    [Parameter (Mandatory=$true)][string] $Platform,
+    [string] $Architecture = "x64"
 )
 
 Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "common-helpers.psm1") -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "nix-helpers.psm1") -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "win-helpers.psm1") -DisableNameChecking
 
-function Get-PythonBuilder
-{
+function Get-PythonBuilder {
     <#
     .SYNOPSIS
     Wrapper for class constructor to simplify importing PythonBuilder.
@@ -51,34 +49,22 @@ function Get-PythonBuilder
 
     #>
 
-    param
-    (
-        [System.String] $Version,
-        [System.String] $Architecture,
-        [System.String] $Platform
+    param (
+        [string] $Version,
+        [string] $Architecture,
+        [string] $Platform
     )
 
     $Platform = $Platform.ToLower()
 
-    if ($Platform -match 'win32')
-    {
+    if ($Platform -match 'win32') {
         $builder = [WinPythonBuilder]::New($Version, $Architecture, $Platform)
-    }
-
-    elseif ($Platform -match 'linux')
-    {
+    } elseif ($Platform -match 'linux') {
         $builder = [UbuntuPythonBuilder]::New($Version, $Architecture, $Platform)
-    }
-
-    elseif ($Platform -match 'darwin')
-    {
+    } elseif ($Platform -match 'darwin') {
         $builder = [macOSPythonBuilder]::New($Version, $Architecture, $Platform)
-    }
-    
-    else
-    {
+    } else {
         Write-Host "##vso[task.logissue type=error;] Invalid platform: $Platform"
-
         exit 1
     }
 
