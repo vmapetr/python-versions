@@ -15,7 +15,7 @@
             "beta"  : "b",
             "rc"    : "rc"
         },
-        "pattern"   : "(?<Version>\\d+\\.\\d+\\.\\d+)\\-?(?<PreReleaseLabel>[A-Za-z]+)\\.?(?<PreReleaseVersion>\\d+)?$",
+        "pattern"   : "(?<Version>\\d+\\.\\d+\\.\\d+)\\-?(?<PreReleaseLabel>[A-Za-z]+)?\\.?(?<PreReleaseVersion>\\d+)?$",
         "preReleaseDelimiter" : "",
         "releseVersionDelimiter" : ""
     }
