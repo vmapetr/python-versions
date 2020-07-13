@@ -33,7 +33,7 @@ class NixPythonBuilder : PythonBuilder {
     [string] $OutputArtifactName
 
     NixPythonBuilder(
-        [string] $version,
+        [semver] $version,
         [string] $architecture,
         [string] $platform
     ) : Base($version, $architecture, $platform) {
@@ -50,9 +50,9 @@ class NixPythonBuilder : PythonBuilder {
 
         $base = $this.GetBaseUri()
         $versionName = $this.GetVersion()
-        $semverVersion = $this.VersionString
+        $nativeVersion = Convert-Version -version $this.Version
 
-        return "${base}/${versionName}/Python-${semverVersion}.tgz"
+        return "${base}/${versionName}/Python-${nativeVersion}.tgz"
     }
 
     [string] GetPythonBinary() {

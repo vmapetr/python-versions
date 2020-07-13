@@ -30,7 +30,6 @@ class PythonBuilder {
     #>
 
     [semver] $Version
-    [string] $VersionString
     [string] $Architecture
     [string] $Platform
     [string] $HostedToolcacheLocation
@@ -39,7 +38,7 @@ class PythonBuilder {
     [string] $ArtifactFolderLocation
     [string] $InstallationTemplatesLocation
 
-    PythonBuilder ([string] $version, [string] $architecture, [string] $platform) {
+    PythonBuilder ([semver] $version, [string] $architecture, [string] $platform) {
         $this.InstallationTemplatesLocation = Join-Path -Path $PSScriptRoot -ChildPath "../installers"
 
         $this.HostedToolcacheLocation = $env:AGENT_TOOLSDIRECTORY
@@ -47,11 +46,10 @@ class PythonBuilder {
         $this.WorkFolderLocation = $env:BUILD_BINARIESDIRECTORY
         $this.ArtifactFolderLocation = $env:BUILD_STAGINGDIRECTORY
 
-        $this.Version = Convert-Version -Version $version
+        $this.Version = $version
         $this.Architecture = $architecture
         $this.Platform = $platform
 
-        $this.VersionString = $version
     }
 
     [uri] GetBaseUri() {

@@ -21,7 +21,7 @@ Required parameter. The platform for which Python will be built.
 #>
 
 param (
-    [Parameter (Mandatory=$true)][string] $Version,
+    [Parameter (Mandatory=$true)][semver] $Version,
     [Parameter (Mandatory=$true)][string] $Platform,
     [string] $Architecture = "x64"
 )
@@ -51,7 +51,7 @@ function Get-PythonBuilder {
     #>
 
     param (
-        [string] $Version,
+        [semver] $Version,
         [string] $Architecture,
         [string] $Platform
     )

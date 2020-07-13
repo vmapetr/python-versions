@@ -17,7 +17,7 @@ class UbuntuPythonBuilder : NixPythonBuilder {
     #>
 
     UbuntuPythonBuilder(
-        [string] $version,
+        [semver] $version,
         [string] $architecture,
         [string] $platform
     ) : Base($version, $architecture, $platform) { }
