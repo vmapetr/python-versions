@@ -50,7 +50,7 @@ function Get-PythonBuilder {
 
     #>
 
-    param (
+    param(
         [semver] $Version,
         [string] $Architecture,
         [string] $Platform
