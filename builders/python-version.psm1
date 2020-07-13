@@ -1,4 +1,9 @@
 function Convert-Version {
+    <#
+    .SYNOPSIS
+    Convert generic semver version to native Python version.
+    #>
+
     param(
         [Parameter(Mandatory)]
         [semver] $version,
