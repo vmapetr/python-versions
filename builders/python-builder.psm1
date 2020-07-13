@@ -82,7 +82,7 @@ class PythonBuilder {
     [string] GetBaseVersion() {
         <#
         .SYNOPSIS
-        Return Major.Minor.Build version string.
+        Return Major.Minor.Patch version string.
         #>
 
         return "$($this.Version.Major).$($this.Version.Minor).$($this.Version.Patch)"
