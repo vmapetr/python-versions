@@ -79,7 +79,7 @@ class PythonBuilder {
         return "$pythonToolcacheLocation/$($this.Version)/$($this.Architecture)"
     }
 
-    [string] GetVersionWithoutSemverLabels() {
+    [string] GetBaseVersion() {
         <#
         .SYNOPSIS
         Return Major.Minor.Build version string.

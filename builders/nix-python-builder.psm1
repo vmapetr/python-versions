@@ -49,7 +49,7 @@ class NixPythonBuilder : PythonBuilder {
         #>
 
         $base = $this.GetBaseUri()
-        $versionName = $this.GetVersionWithoutSemverLabels()
+        $versionName = $this.GetBaseVersion()
         $nativeVersion = Convert-Version -version $this.Version
 
         return "${base}/${versionName}/Python-${nativeVersion}.tgz"
