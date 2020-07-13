@@ -20,7 +20,7 @@ Required parameter. The platform for which Python will be built.
 
 #>
 
-param (
+param(
     [Parameter (Mandatory=$true)][semver] $Version,
     [Parameter (Mandatory=$true)][string] $Platform,
     [string] $Architecture = "x64"
