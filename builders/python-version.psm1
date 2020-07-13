@@ -38,14 +38,17 @@ function Convert-Version {
     )
 
     $nativePythonPattern = "(?<Version>[\d\.]+)(?<Label>[a-z]+)?(?<LabelNumber>\d+)?"
-    
     $regexResult = [Regex]::Match($version, $nativePythonPattern)
-
     if (-not $regexResult) { throw "Incorrect version format" }
     
     $version = $regexResult.Groups["Version"].Value
-    $label = Convert-Label $regexResult.Groups["Label"].Value
-    $labelNumber = Convert-LabelNumber $regexResult.Groups["LabelNumber"].Value
+    $semverVersion = "${version}"
 
-    return [Semver]::Parse("${version}${label}${labelNumber}")
+    if ($regexResult.Groups["Label"].Success -or $regexResult.Groups["LabelNumber"].Success) {
+        $label = Convert-Label $regexResult.Groups["Label"].Value
+        $labelNumber = Convert-LabelNumber $regexResult.Groups["LabelNumber"].Value
+        $semverVersion += "${label}${labelNumber}"
+    }
+
+    return [Semver]::Parse($semverVersion)
 }
