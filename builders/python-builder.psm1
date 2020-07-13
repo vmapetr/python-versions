@@ -49,7 +49,6 @@ class PythonBuilder {
         $this.Version = $version
         $this.Architecture = $architecture
         $this.Platform = $platform
-
     }
 
     [uri] GetBaseUri() {
@@ -80,7 +79,7 @@ class PythonBuilder {
         return "$pythonToolcacheLocation/$($this.Version)/$($this.Architecture)"
     }
 
-    [string] GetVersion() {
+    [string] GetVersionWithoutSemverLabels() {
         <#
         .SYNOPSIS
         Return Major.Minor.Build version string.

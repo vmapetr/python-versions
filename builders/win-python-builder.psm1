@@ -72,7 +72,7 @@ class WinPythonBuilder : PythonBuilder {
         #>
 
         $base = $this.GetBaseUri()
-        $versionName = $this.GetVersion()
+        $versionName = $this.GetVersionWithoutSemverLabels()
         $nativeVersion = Convert-Version -version $this.Version
         $architecture = $this.GetArchitectureExtension()
         $extension = $this.GetPythonExtension()

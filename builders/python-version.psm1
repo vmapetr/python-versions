@@ -1,3 +1,22 @@
+function Convert-Label() {
+    <#
+    .SYNOPSIS
+    Convert generic semver label to native Python label.
+    #>
+
+    param(
+        [Parameter(Mandatory)]
+        [string] $label
+    )
+
+    switch ($label) {
+        "alpha" { return "a" }
+        "beta" { return "b" }
+        "rc" { return "rc" }
+        Default { throw "Invalid version label '$label'" }
+    }
+}
+
 function Convert-Version {
     <#
     .SYNOPSIS
@@ -18,8 +37,12 @@ function Convert-Version {
 
     if ($version.PreReleaseLabel)
     {
-        $preReleaseLabel = ($version.PreReleaseLabel).Replace("${delimiter}", "")
-        $nativeVersion += "${preReleaseLabel}"
+        $preReleaseLabel = ($version.PreReleaseLabel).Split($delimiter)
+        
+        $preReleaseLabelName = Convert-Label -Label $preReleaseLabel[0]
+        $preReleaseLabelVersion = $preReleaseLabel[1]
+
+        $nativeVersion += "${preReleaseLabelName}${preReleaseLabelVersion}"
     }
 
     return $nativeVersion
