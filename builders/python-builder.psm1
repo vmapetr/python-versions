@@ -30,6 +30,7 @@ class PythonBuilder {
     #>
 
     [semver] $Version
+    [string] $VersionString
     [string] $Architecture
     [string] $Platform
     [string] $HostedToolcacheLocation
@@ -48,9 +49,11 @@ class PythonBuilder {
         $this.WorkFolderLocation = $env:BUILD_BINARIESDIRECTORY
         $this.ArtifactFolderLocation = $env:BUILD_STAGINGDIRECTORY
 
-        $this.Version = $this.ConvertVersion($version, "PythonNotation")
+        $this.Version = Convert-Version -Version $version
         $this.Architecture = $architecture
         $this.Platform = $platform
+
+        $this.VersionString = $version
     }
 
     [uri] GetBaseUri() {
@@ -90,51 +93,6 @@ class PythonBuilder {
         return "$($this.Version.Major).$($this.Version.Minor).$($this.Version.Patch)"
     }
 
-    [string] ConvertVersion($version, $notation) {
-        <#
-        .SYNOPSIS
-        Convert version to required notation correct
-
-        .PARAMETER Version
-        The version of Python that should be converted.
-
-        .PARAMETER notation
-        The notation that should be used in version. Described in versions-mapping.json config file.
-
-        #>
-
-        # Load version mapping
-        $versionMap = $this.GetVersionMapping()
-        $mapContext = $versionMap | Select-Object -ExpandProperty $notation
-
-        # Get required delimiters and regexp pattern
-        $preReleaseDelimiter = $mapContext | Select-Object -ExpandProperty "preReleaseDelimiter"
-        $releseVersionDelimiter = $mapContext | Select-Object -ExpandProperty "releseVersionDelimiter"
-        [regex] $pattern = $mapContext | Select-Object -ExpandProperty "pattern"
-
-        $versionGroups = $pattern.Match($version)
-
-        # Get base version string
-        $versionString = $versionGroups.Groups["Version"].Value
-
-        if ($versionGroups.Groups["PreReleaseLabel"].Success) {
-            $preReleaseLabel = $versionGroups.Groups["PreReleaseLabel"].Value
-            $preReleaseLabelVersion = $versionGroups.Groups["PreReleaseVersion"].Value
-
-            # Get notation for current context
-            $preReleaseLabel = $mapContext  | Select-Object -ExpandProperty "releaseNotation" `
-                                            | Select-Object -ExpandProperty $preReleaseLabel
-
-            # Format symver correct pre-release version
-            $versionString += $preReleaseDelimiter
-            $versionString += $preReleaseLabel
-            $versionString += $releseVersionDelimiter
-            $versionString += $preReleaseLabelVersion
-        }   
-
-        return $versionString
-    }
-
     [void] PreparePythonToolcacheLocation() {
         <#
         .SYNOPSIS
@@ -150,13 +108,5 @@ class PythonBuilder {
             Write-Host "Create $pythonBinariesLocation folder..."
             New-Item -ItemType Directory -Path $pythonBinariesLocation 
         }
-    }
-
-    ### MOVE TO HELPERS
-    [object] GetVersionMapping() {
-        $mapFileLocation = Join-Path -Path $this.ConfigsLocation -ChildPath "versions-mapping.json"
-        $versionMap = Get-Content -Path $mapFileLocation -Raw | ConvertFrom-Json
-
-        return $versionMap
     }
 }

@@ -73,11 +73,11 @@ class WinPythonBuilder : PythonBuilder {
 
         $base = $this.GetBaseUri()
         $versionName = $this.GetVersion()
-        $symverVersion = $this.ConvertVersion($this.Version, "SymverNotation")
+        $semverVersion = $this.VersionString
         $architecture = $this.GetArchitectureExtension()
         $extension = $this.GetPythonExtension()
 
-        $uri = "${base}/${versionName}/python-${symverVersion}${architecture}${extension}"
+        $uri = "${base}/${versionName}/python-${semverVersion}${architecture}${extension}"
 
         return $uri
     }

@@ -50,9 +50,9 @@ class NixPythonBuilder : PythonBuilder {
 
         $base = $this.GetBaseUri()
         $versionName = $this.GetVersion()
-        $symverVersion = $this.ConvertVersion($this.Version, "SymverNotation")
+        $semverVersion = $this.VersionString
 
-        return "${base}/${versionName}/Python-${symverVersion}.tgz"
+        return "${base}/${versionName}/Python-${semverVersion}.tgz"
     }
 
     [string] GetPythonBinary() {

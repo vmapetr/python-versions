@@ -29,6 +29,7 @@ param (
 Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "common-helpers.psm1") -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "nix-helpers.psm1") -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot "../helpers" | Join-Path -ChildPath "win-helpers.psm1") -DisableNameChecking
+Import-Module (Join-Path $PSScriptRoot "python-version.psm1") -DisableNameChecking
 
 function Get-PythonBuilder {
     <#
@@ -56,7 +57,6 @@ function Get-PythonBuilder {
     )
 
     $Platform = $Platform.ToLower()
-
     if ($Platform -match 'win32') {
         $builder = [WinPythonBuilder]::New($Version, $Architecture, $Platform)
     } elseif ($Platform -match 'linux') {
