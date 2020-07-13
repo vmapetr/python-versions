@@ -38,11 +38,9 @@ class PythonBuilder {
     [string] $WorkFolderLocation
     [string] $ArtifactFolderLocation
     [string] $InstallationTemplatesLocation
-    [string] $ConfigsLocation
 
     PythonBuilder ([string] $version, [string] $architecture, [string] $platform) {
         $this.InstallationTemplatesLocation = Join-Path -Path $PSScriptRoot -ChildPath "../installers"
-        $this.ConfigsLocation = Join-Path -Path $PSScriptRoot -ChildPath "../config"
 
         $this.HostedToolcacheLocation = $env:AGENT_TOOLSDIRECTORY
         $this.TempFolderLocation = $env:BUILD_SOURCESDIRECTORY
